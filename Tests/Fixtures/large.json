@@ -1,0 +1,15 @@
+{"results":[{
+  "siren":"732829320","nom_complet":"ATELIER TEST (AT)","nom_raison_sociale":"ATELIER TEST","sigle":"AT",
+  "nature_juridique":"5710","etat_administratif":"A","date_creation":"2010-01-01","date_fermeture":null,
+  "activite_principale":"62.01Z","section_activite_principale":"J","categorie_entreprise":"ETI",
+  "tranche_effectif_salarie":"22","annee_tranche_effectif_salarie":"2023",
+  "nombre_etablissements":12,"nombre_etablissements_ouverts":9,"date_mise_a_jour":"2026-09-01T10:00:00",
+  "siege":{"siret":"73282932000074","est_siege":true,"etat_administratif":"A","adresse":"1 RUE DU TEST 67000 STRASBOURG","numero_voie":"1","type_voie":"RUE","libelle_voie":"DU TEST","code_postal":"67000","libelle_commune":"STRASBOURG","latitude":"48.58","longitude":"7.75","activite_principale":"62.01Z","tranche_effectif_salarie":"21","date_creation":"2010-01-01","liste_enseignes":["ATELIER"],"nom_commercial":"L'Atelier"},
+  "matching_etablissements":[{"siret":"73282932000082","est_siege":false,"etat_administratif":"F","adresse":"2 AVENUE X 75001 PARIS","code_postal":"75001","libelle_commune":"PARIS","date_fermeture":"2020-06-30"}],
+  "dirigeants":[
+    {"type_dirigeant":"personne physique","nom":"DUPONT","prenoms":"JEANNE","annee_de_naissance":"1970","qualite":"Président","nationalite":"Française"},
+    {"type_dirigeant":"personne morale","siren":"552100554","denomination":"CABINET AUDIT","qualite":"Commissaire aux comptes titulaire"}
+  ],
+  "finances":{"2022":{"ca":1200000,"resultat_net":80000},"2023":{"ca":1500000,"resultat_net":-20000}},
+  "complements":{"est_ess":true,"est_rge":false,"est_qualiopi":true,"est_societe_mission":true,"liste_idcc":["1486"],"egapro_renseignee":true}
+}],"total_results":1}

@@ -1,0 +1,20 @@
+{
+    "name": "omnistate/annuaire-entreprises",
+    "type": "library",
+    "description": "Omnistate Annuaire des Entreprises: French companies from the State's Recherche d'entreprises API (INSEE Sirene + INPI's RNE) - free, no key.",
+    "keywords": ["siren", "siret", "sirene", "rne", "insee", "inpi", "france", "company", "omnistate"],
+    "license": "LGPL-3.0-or-later",
+    "authors": [{"name": "Marco Meyer", "email": "marco.meyer@glitchr.io"}],
+    "require": {
+        "php": ">=8.2",
+        "glitchr/omnistate": "^1.0@dev",
+        "symfony/http-client-contracts": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0",
+        "symfony/http-client": "^6.4|^7.0|^8.0"
+    },
+    "autoload": {"psr-4": {"Omnistate\\AnnuaireEntreprises\\": ""}, "exclude-from-classmap": ["/Tests/"]},
+    "autoload-dev": {"psr-4": {"Omnistate\\AnnuaireEntreprises\\Tests\\": "Tests/"}},
+    "config": {"sort-packages": true}
+}
