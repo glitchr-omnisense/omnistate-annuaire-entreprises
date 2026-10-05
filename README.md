@@ -12,4 +12,8 @@ $company->finances, $company->labels /* ess, rge, qualiopi... */, $company->coll
 $company->vatNumber /* from its SIREN */, $company->raw /* the whole answer */;
 ```
 
+No framework needed: the package requires `glitchr/omnistate` and `symfony/http-client`.
+`$httpClient` is the HTTP client to call with - the application's, `HttpClient::create()` in
+plain PHP, a `MockHttpClient` in a test.
+
 Too many calls throw `UnavailableException` with the `Retry-After` the API gave.
