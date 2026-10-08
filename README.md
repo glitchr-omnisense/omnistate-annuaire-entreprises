@@ -17,3 +17,7 @@ No framework needed: the package requires `glitchr/omnistate` and `symfony/http-
 plain PHP, a `MockHttpClient` in a test.
 
 Too many calls throw `UnavailableException` with the `Retry-After` the API gave.
+
+## License
+
+MIT since 2026-10-09; earlier versions remain published under LGPL-3.0-or-later.
