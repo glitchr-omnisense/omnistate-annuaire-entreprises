@@ -106,6 +106,9 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface
             if (400 === $status || 404 === $status) {
                 return [];
             }
+            if ($status >= 400) {
+                throw new UnavailableException(sprintf('Recherche d\'entreprises refused the call (%d).', $status));
+            }
             $answer = $response->toArray(false);
         } catch (ExceptionInterface $e) {
             throw new UnavailableException('Recherche d\'entreprises did not answer: '.$e->getMessage(), null, $e);
