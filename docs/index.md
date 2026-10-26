@@ -1,6 +1,6 @@
 # omnistate/annuaire-entreprises
 
-French companies for [omniscient/omnistate](https://github.com/glitchr-studio/omnistate), from the
+French companies for [omnisense/omnistate](https://github.com/glitchr-omnisense/omnistate), from the
 State's [Recherche d'entreprises API](https://recherche-entreprises.api.gouv.fr/docs/) - the one
 behind [annuaire-entreprises.data.gouv.fr](https://annuaire-entreprises.data.gouv.fr), which joins
 INSEE's Sirene and INPI's national register (RNE). One endpoint, for a lookup and a search alike:
@@ -16,10 +16,10 @@ sandbox: the API answers the real register.
 ## Installation
 
 ```sh
-composer require omniscient/omnistate omnistate/annuaire-entreprises
+composer require omnisense/omnistate omnistate/annuaire-entreprises
 ```
 
-Requires PHP 8.2, `omniscient/omnistate` (1.x) and `symfony/http-client` (6.4, 7 or 8). In a
+Requires PHP 8.2, `omnisense/omnistate` (1.x) and `symfony/http-client` (6.4, 7 or 8). In a
 Symfony application with `Omnistate\Bridge\Symfony\OmnistateBundle`, the register is registered
 (tag `omnistate.company_registry`) as soon as the package is installed; nothing to configure.
 
@@ -194,7 +194,7 @@ Defects found in the code:
   first nine characters as given, while `supports()` ignores spaces, dots and dashes: called
   directly, `company('356 000 000')` is supported and answers `null`. Through the facade, which
   normalizes first, it is found.
-- In omniscient/omnistate, `Identifier/Siret.php:29-30` - La Poste's head office SIRET
+- In omnisense/omnistate, `Identifier/Siret.php:29-30` - La Poste's head office SIRET
   `35600000000048`, as this API gives it, fails `Siret::isValid()`: `supports()` refuses it (the
   example's second line).
 
