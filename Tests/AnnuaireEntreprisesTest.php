@@ -35,6 +35,23 @@ final class AnnuaireEntreprisesTest extends TestCase
         self::assertSame('901821074', $company->raw['siren'], 'the whole answer kept');
     }
 
+    /** What supports() takes, company() finds: spaces, dots and dashes are not the identifier. */
+    public function testACompanyByAnIdentifierAsTyped(): void
+    {
+        $requests = [];
+        $http = new MockHttpClient(static function (string $method, string $url) use (&$requests): MockResponse {
+            $requests[] = $url;
+
+            return new MockResponse((string) file_get_contents(__DIR__.'/Fixtures/siren.json'));
+        });
+        $registry = new AnnuaireEntreprises($http);
+
+        self::assertTrue($registry->supports('901 821 074'));
+        self::assertSame('GLITCH ART', $registry->company('901 821 074')?->name);
+        self::assertSame('GLITCH ART', $registry->company('901.821.074-00019')?->name);
+        self::assertStringContainsString('q=901821074&', $requests[0], 'asked as the register writes it');
+    }
+
     public function testAnEstablishmentBySiret(): void
     {
         $company = $this->registry('siret.json')->company('90182107400019');

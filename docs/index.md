@@ -48,9 +48,9 @@ address; past that it answers HTTP 429.
 ## Behaviour
 
 **What it takes.** `supports()` is `Siren::isValid()` or `Siret::isValid()`: nine or fourteen
-digits whose key is right, spaces, dots and dashes ignored. Called directly, `company()` expects
-the identifier without them (see [Errors](#errors)); through the facade it is normalized first,
-and a French VAT number is looked up by its SIREN.
+digits whose key is right, spaces, dots and dashes ignored; `company()` reads it the same way
+(asked as nine or fourteen digits). Through the facade a French VAT number is looked up by its
+SIREN.
 
 **A company.** The identifier is the search's `q`, one result asked; the result is the company
 when its `siren` is the identifier's first nine digits, else `null`. A SIRET thus gives its
@@ -152,8 +152,9 @@ LA POSTE, SA nationale à conseil d'administration, GE, 13131 establishments, he
   343759148 SCI MAISON DE LA BOULANGERIE 2      STRASBOURG, 0 matching establishment(s) besides the head office
 ```
 
-(run on 2026-10-25 in omnistate's Docker harness, against the API. The second line is
-[a defect](#verified-and-not): La Poste's head office SIRET, as the API writes it, is refused.)
+(run on 2026-10-25 in omnistate's Docker harness, against the API. The second line read
+`false` then: La Poste's head office SIRET, as the API writes it, was refused by the core's
+`Siret::isValid()`; since 2026-10-29 it is `true`.)
 
 Through the facade, which normalizes identifiers and keeps answers:
 
@@ -183,20 +184,10 @@ An identifier it does not support is never asked: through the facade it is a
 Tested offline: `Tests/AnnuaireEntreprisesTest.php` (a company by SIREN with every field, an
 establishment by SIRET, a large answer with acronym, signs, closed establishments, a company as
 manager, finances newest first and labels, an unknown company, a 429 with its `Retry-After`,
-`supports()`) on answers of the API recorded in `Tests/Fixtures`, and
+`supports()`, a company by an identifier with spaces, dots and dashes) on answers of the API recorded in `Tests/Fixtures`, and
 `Tests/AnnuaireEntreprisesContractTest.php`, omnistate's conformance suite.
 
 Run live on 2026-10-25 (the example above, and the core manual's company examples).
-
-Defects found in the code:
-
-- `AnnuaireEntreprises.php:76` - `company()` compares the result's SIREN with the identifier's
-  first nine characters as given, while `supports()` ignores spaces, dots and dashes: called
-  directly, `company('356 000 000')` is supported and answers `null`. Through the facade, which
-  normalizes first, it is found.
-- In omnisense/omnistate, `Identifier/Siret.php:29-30` - La Poste's head office SIRET
-  `35600000000048`, as this API gives it, fails `Siret::isValid()`: `supports()` refuses it (the
-  example's second line).
 
 ## Responsibility
 

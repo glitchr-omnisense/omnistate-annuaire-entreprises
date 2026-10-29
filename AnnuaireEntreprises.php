@@ -72,6 +72,8 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface
 
     public function company(string $identifier): ?Company
     {
+        // As supports() reads it: spaces, dots and dashes are not the identifier.
+        $identifier = Siret::normalize($identifier) ?? Siren::normalize($identifier) ?? $identifier;
         foreach ($this->ask($identifier, 1) as $result) {
             if ($result['siren'] === substr($identifier, 0, 9)) {
                 return $this->toCompany($result);
