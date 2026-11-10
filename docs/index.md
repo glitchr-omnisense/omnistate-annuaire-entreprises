@@ -189,6 +189,14 @@ manager, finances newest first and labels, an unknown company, a 429 with its `R
 
 Run live on 2026-10-25 (the example above, and the core manual's company examples).
 
+## Usage policy
+
+`policy.json` (omnisense/contracts' schema), given by `usagePolicy()`: limits 7 a second. The credit: "Source : Annuaire des Entreprises (INSEE, INPI)" (Licence Ouverte 2.0 (Etalab)).
+The figures are this manual's, read on 2026-10-25; the service's terms were not read again when the
+policy was written (`verifiedAt: null`), so what they say of commercial use, caching and storage is
+`unknown`. Through `Omnistate\Omnistate`, a call over a limit is never made and a 429 holds the next
+calls for its `retryAfter` (core: docs/policies.md); a site adds its own limits with `policies:`.
+
 ## Responsibility
 
 An independent, unofficial client, not affiliated with the DINUM (Annuaire des Entreprises), the

@@ -2,6 +2,8 @@
 
 namespace Omnistate\AnnuaireEntreprises;
 
+use Omnisense\Contracts\Policy\DeclaresUsagePolicyInterface;
+use Omnisense\Contracts\Policy\UsagePolicy;
 use Omnistate\Exception\UnavailableException;
 use Omnistate\Identifier\Siren;
 use Omnistate\Identifier\Siret;
@@ -29,7 +31,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * collective agreements - and the VAT number its SIREN makes. The whole
  * answer stays in Company::$raw.
  */
-final class AnnuaireEntreprises implements CompanyRegistryInterface
+final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsagePolicyInterface
 {
     public const URL = 'https://recherche-entreprises.api.gouv.fr/search';
 
@@ -58,6 +60,12 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface
         private readonly HttpClientInterface $http,
         private readonly float $timeout = 10,
     ) {
+    }
+
+    /** Its usage policy: policy.json, beside this class. */
+    public function usagePolicy(): UsagePolicy
+    {
+        return UsagePolicy::fromFile(__DIR__.'/policy.json');
     }
 
     public function name(): string
@@ -100,10 +108,10 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface
             if (429 === $status) {
                 $retry = $response->getHeaders(false)['retry-after'][0] ?? null;
 
-                throw new UnavailableException('Recherche d\'entreprises: too many calls (about seven a second).', is_numeric($retry) ? (int) $retry : 1);
+                throw new UnavailableException('Recherche d\'entreprises: too many calls (about seven a second).', is_numeric($retry) ? (int) $retry : 1, null, 429);
             }
             if ($status >= 500) {
-                throw new UnavailableException(sprintf('Recherche d\'entreprises answered %d.', $status));
+                throw new UnavailableException(sprintf('Recherche d\'entreprises answered %d.', $status), null, null, $status);
             }
             if (400 === $status || 404 === $status) {
                 return [];

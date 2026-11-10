@@ -1,0 +1,47 @@
+{
+    "$schema": "https://github.com/glitchr-omnisense/contracts/blob/1.x/resources/usage-policy.schema.json",
+    "provider": "annuaire-entreprises",
+    "rateLimits": [
+        {
+            "max": 7,
+            "window": "second",
+            "scope": "application",
+            "operations": [],
+            "note": "About seven calls a second per calling address (the API's documentation, as docs/index.md reads it)."
+        }
+    ],
+    "rights": {
+        "commercial": "unknown",
+        "openSourceRequired": null,
+        "caching": {
+            "permission": "unknown",
+            "maxTtl": null
+        },
+        "storage": "unknown",
+        "redistribution": "unknown",
+        "attribution": {
+            "required": true,
+            "text": "Source : Annuaire des Entreprises (INSEE, INPI)",
+            "url": "https://annuaire-entreprises.data.gouv.fr",
+            "where": [
+                "source"
+            ]
+        },
+        "licence": "Licence Ouverte 2.0 (Etalab)"
+    },
+    "requirements": {
+        "key": false,
+        "userAgent": {
+            "required": false,
+            "pattern": null
+        }
+    },
+    "provenance": {
+        "terms": "https://annuaire-entreprises.data.gouv.fr/cgu",
+        "policy": "https://recherche-entreprises.api.gouv.fr/docs/",
+        "verifiedAt": null,
+        "declaredBy": "maintainer",
+        "contact": null,
+        "notes": "Figures from this package's docs/index.md (its live run of 2026-10-25); the terms were not re-read when the policy was first written (2026-11-10): rights the terms were not read for are unknown. The licence is the data's (Sirene and the RNE under the Licence Ouverte), as the Annuaire des Entreprises states it; its CGU not re-read."
+    }
+}
