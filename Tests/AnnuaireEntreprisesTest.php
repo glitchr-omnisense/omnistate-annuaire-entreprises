@@ -104,6 +104,18 @@ final class AnnuaireEntreprisesTest extends TestCase
         }
     }
 
+    public function testAnAnswerNotShapedAsTheRegistersIsUnavailable(): void
+    {
+        foreach (['{"results":"none"}', '{"results":[{"siren":"901821074","dirigeants":"none"}]}'] as $body) {
+            try {
+                (new AnnuaireEntreprises(new MockHttpClient(new MockResponse($body))))->company('901821074');
+                self::fail('unavailable: '.$body);
+            } catch (UnavailableException $e) {
+                self::assertStringStartsWith('Recherche d\'entreprises answered', $e->getMessage());
+            }
+        }
+    }
+
     public function testSupports(): void
     {
         $registry = new AnnuaireEntreprises(new MockHttpClient());

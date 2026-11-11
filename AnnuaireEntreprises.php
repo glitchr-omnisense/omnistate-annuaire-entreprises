@@ -124,7 +124,12 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
             throw new UnavailableException('Recherche d\'entreprises did not answer: '.$e->getMessage(), null, $e);
         }
 
-        return array_values(array_filter($answer['results'] ?? [], 'is_array'));
+        $results = $answer['results'] ?? [];
+        if (!\is_array($results)) {
+            throw new UnavailableException('Recherche d\'entreprises answered no list of results.');
+        }
+
+        return array_values(array_filter($results, 'is_array'));
     }
 
     /** @param array<string, mixed> $r */
@@ -152,6 +157,11 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
             }
         }
 
+        $managers = $r['dirigeants'] ?? [];
+        if (!\is_array($managers)) {
+            throw new UnavailableException('Recherche d\'entreprises answered a company whose managers are not a list.');
+        }
+
         $name = (string) ($r['nom_complet'] ?? $r['nom_raison_sociale'] ?? $r['siren']);
 
         return new Company(
@@ -172,7 +182,7 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
             establishments: $establishments,
             establishmentCount: isset($r['nombre_etablissements']) ? (int) $r['nombre_etablissements'] : null,
             openEstablishmentCount: isset($r['nombre_etablissements_ouverts']) ? (int) $r['nombre_etablissements_ouverts'] : null,
-            managers: array_values(array_map(fn (array $m) => $this->manager($m), array_filter($r['dirigeants'] ?? [], 'is_array'))),
+            managers: array_values(array_map(fn (array $m) => $this->manager($m), array_filter($managers, 'is_array'))),
             finances: $finances,
             labels: $labels,
             collectiveAgreements: array_values(array_map('strval', \is_array($complements['liste_idcc'] ?? null) ? $complements['liste_idcc'] : [])),

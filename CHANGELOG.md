@@ -15,3 +15,6 @@
 - `company()` called directly reads the identifier as `supports()` does: spaces, dots and dashes
   are dropped before asking, so `company('356 000 000')` finds La Poste, where it answered `null`
   (the result's SIREN was compared with the identifier's first nine characters as typed).
+- An answer whose `results`, or a company's `dirigeants`, is not a list is an
+  `UnavailableException` (the family's rule on a body that is not what it should be), where PHP
+  threw a `TypeError`.
