@@ -7,7 +7,7 @@ use Omnistate\Model\Headcount;
 /** INSEE's headcount ranges (tranches d'effectif salarié). */
 final class Headcounts
 {
-    /** @var array<string, array{int, ?int}> code => [min, max] */
+    /** @var array<int|string, array{int, ?int}> code => [min, max] (PHP keeps "11" as 11) */
     public const RANGES = [
         'NN' => [0, 0], '00' => [0, 0], '01' => [1, 2], '02' => [3, 5], '03' => [6, 9],
         '11' => [10, 19], '12' => [20, 49], '21' => [50, 99], '22' => [100, 199], '31' => [200, 249],

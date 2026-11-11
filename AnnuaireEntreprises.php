@@ -96,7 +96,7 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
         return array_map(fn (array $result) => $this->toCompany($result), $this->ask($query, max(1, min(25, $limit))));
     }
 
-    /** @return list<array<string, mixed>> */
+    /** @return list<array<mixed>> */
     private function ask(string $query, int $perPage): array
     {
         try {
@@ -132,12 +132,12 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
         return array_values(array_filter($results, 'is_array'));
     }
 
-    /** @param array<string, mixed> $r */
+    /** @param array<mixed> $r */
     private function toCompany(array $r): Company
     {
         $head = \is_array($r['siege'] ?? null) ? $this->establishment($r['siege']) : null;
         $establishments = [];
-        foreach ($r['matching_etablissements'] ?? [] as $e) {
+        foreach (\is_array($r['matching_etablissements'] ?? null) ? $r['matching_etablissements'] : [] as $e) {
             if (\is_array($e) && ($e['siret'] ?? null) !== $head?->identifier) {
                 $establishments[] = $this->establishment($e);
             }
@@ -145,6 +145,7 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
 
         $finances = [];
         foreach (\is_array($r['finances'] ?? null) ? $r['finances'] : [] as $year => $figures) {
+            $figures = \is_array($figures) ? $figures : [];
             $finances[] = new FinancialYear((int) $year, self::float($figures['ca'] ?? null), self::float($figures['resultat_net'] ?? null));
         }
         usort($finances, fn (FinancialYear $a, FinancialYear $b) => $b->year <=> $a->year);
@@ -162,10 +163,10 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
             throw new UnavailableException('Recherche d\'entreprises answered a company whose managers are not a list.');
         }
 
-        $name = (string) ($r['nom_complet'] ?? $r['nom_raison_sociale'] ?? $r['siren']);
+        $name = self::text($r['nom_complet'] ?? $r['nom_raison_sociale'] ?? $r['siren'] ?? null);
 
         return new Company(
-            identifier: (string) $r['siren'],
+            identifier: self::text($r['siren'] ?? null),
             name: $name,
             status: 'C' === ($r['etat_administratif'] ?? null) ? CompanyStatus::CLOSED : CompanyStatus::ACTIVE,
             country: 'FR',
@@ -180,19 +181,19 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
             closedOn: self::date($r['date_fermeture'] ?? null),
             headOffice: $head,
             establishments: $establishments,
-            establishmentCount: isset($r['nombre_etablissements']) ? (int) $r['nombre_etablissements'] : null,
-            openEstablishmentCount: isset($r['nombre_etablissements_ouverts']) ? (int) $r['nombre_etablissements_ouverts'] : null,
+            establishmentCount: isset($r['nombre_etablissements']) ? self::integer($r['nombre_etablissements']) : null,
+            openEstablishmentCount: isset($r['nombre_etablissements_ouverts']) ? self::integer($r['nombre_etablissements_ouverts']) : null,
             managers: array_values(array_map(fn (array $m) => $this->manager($m), array_filter($managers, 'is_array'))),
             finances: $finances,
             labels: $labels,
-            collectiveAgreements: array_values(array_map('strval', \is_array($complements['liste_idcc'] ?? null) ? $complements['liste_idcc'] : [])),
-            vatNumber: Siren::isValid((string) $r['siren']) ? Siren::toVatNumber((string) $r['siren']) : null,
+            collectiveAgreements: array_values(array_map(self::text(...), \is_array($complements['liste_idcc'] ?? null) ? $complements['liste_idcc'] : [])),
+            vatNumber: Siren::isValid(self::text($r['siren'] ?? null)) ? Siren::toVatNumber(self::text($r['siren'] ?? null)) : null,
             updatedAt: self::date($r['date_mise_a_jour'] ?? null),
             raw: $r,
         );
     }
 
-    /** @param array<string, mixed> $e */
+    /** @param array<mixed> $e */
     private function establishment(array $e): Establishment
     {
         $street = trim(implode(' ', array_filter([
@@ -201,7 +202,7 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
         ])));
 
         return new Establishment(
-            identifier: (string) $e['siret'],
+            identifier: self::text($e['siret'] ?? null),
             headOffice: (bool) ($e['est_siege'] ?? false),
             status: 'F' === ($e['etat_administratif'] ?? null) ? CompanyStatus::CLOSED : CompanyStatus::ACTIVE,
             address: new Address(
@@ -214,7 +215,7 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
                 longitude: self::float($e['longitude'] ?? null),
             ),
             name: self::string($e['nom_commercial'] ?? null),
-            signs: array_values(array_map('strval', \is_array($e['liste_enseignes'] ?? null) ? $e['liste_enseignes'] : [])),
+            signs: array_values(array_map(self::text(...), \is_array($e['liste_enseignes'] ?? null) ? $e['liste_enseignes'] : [])),
             activity: self::activity($e['activite_principale'] ?? null),
             headcount: Headcounts::of(self::string($e['tranche_effectif_salarie'] ?? null), $e['annee_tranche_effectif_salarie'] ?? null),
             createdOn: self::date($e['date_creation'] ?? null),
@@ -222,13 +223,13 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
         );
     }
 
-    /** @param array<string, mixed> $m */
+    /** @param array<mixed> $m */
     private function manager(array $m): Manager
     {
         $person = 'personne morale' !== ($m['type_dirigeant'] ?? null);
 
         return new Manager(
-            name: (string) ($person ? ($m['nom'] ?? '') : ($m['denomination'] ?? $m['nom'] ?? '')),
+            name: self::text($person ? ($m['nom'] ?? '') : ($m['denomination'] ?? $m['nom'] ?? '')),
             role: self::string($m['qualite'] ?? null),
             person: $person,
             firstNames: $person ? self::string($m['prenoms'] ?? null) : null,
@@ -241,6 +242,18 @@ final class AnnuaireEntreprises implements CompanyRegistryInterface, DeclaresUsa
     private static function activity(mixed $code, mixed $section = null): ?Activity
     {
         return \is_string($code) && '' !== $code ? new Activity($code, 'NAF rev. 2', null, \is_string($section) ? $section : null) : null;
+    }
+
+    /** (string) of a scalar, as the answer's values were cast: "" for null or anything else. */
+    private static function text(mixed $value): string
+    {
+        return \is_scalar($value) ? (string) $value : '';
+    }
+
+    /** (int) of a scalar, 0 for anything else. */
+    private static function integer(mixed $value): int
+    {
+        return \is_scalar($value) ? (int) $value : 0;
     }
 
     private static function string(mixed $value): ?string

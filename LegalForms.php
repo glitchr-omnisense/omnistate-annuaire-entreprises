@@ -11,7 +11,7 @@ use Omnistate\Model\LegalForm;
  */
 final class LegalForms
 {
-    /** @var array<string, array{string, ?string}> code => [name, short name] */
+    /** @var array<int|string, array{string, ?string}> code => [name, short name] (PHP keeps "1000" as 1000) */
     public const FORMS = [
         '1000' => ['Entrepreneur individuel', 'EI'],
         '2110' => ['Indivision entre personnes physiques', null],

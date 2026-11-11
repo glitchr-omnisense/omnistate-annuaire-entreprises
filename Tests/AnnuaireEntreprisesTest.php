@@ -14,19 +14,20 @@ final class AnnuaireEntreprisesTest extends TestCase
     public function testACompanyBySiren(): void
     {
         $company = $this->registry('siren.json')->company('901821074');
+        self::assertNotNull($company);
 
         self::assertSame('GLITCH ART', $company->name);
         self::assertSame(CompanyStatus::ACTIVE, $company->status);
-        self::assertSame('5499', $company->legalForm->code);
+        self::assertSame('5499', $company->legalForm?->code);
         self::assertSame('SARL', (string) $company->legalForm);
-        self::assertSame('62.02A', $company->activity->code);
+        self::assertSame('62.02A', $company->activity?->code);
         self::assertSame('J', $company->activity->section);
         self::assertSame('PME', $company->category);
-        self::assertFalse($company->headcount->isEmployer(), 'NN: no employee');
-        self::assertSame('2021-07-03', $company->createdOn->format('Y-m-d'));
+        self::assertFalse($company->headcount?->isEmployer(), 'NN: no employee');
+        self::assertSame('2021-07-03', $company->createdOn?->format('Y-m-d'));
         self::assertSame('FR53901821074', $company->vatNumber, 'from its SIREN');
-        self::assertSame('90182107400019', $company->headOffice->identifier);
-        self::assertSame('5 RUE VINCENT SCOTTO', $company->headOffice->address->street);
+        self::assertSame('90182107400019', $company->headOffice?->identifier);
+        self::assertSame('5 RUE VINCENT SCOTTO', $company->headOffice->address?->street);
         self::assertSame('ILLKIRCH-GRAFFENSTADEN', $company->headOffice->address->city);
         self::assertEqualsWithDelta(48.5313533, $company->headOffice->address->latitude, 1e-6);
         self::assertSame('MARCO MEYER', (string) $company->managers[0]);
@@ -55,23 +56,25 @@ final class AnnuaireEntreprisesTest extends TestCase
     public function testAnEstablishmentBySiret(): void
     {
         $company = $this->registry('siret.json')->company('90182107400019');
+        self::assertNotNull($company);
 
-        self::assertTrue($company->establishment('90182107400019')->headOffice);
+        self::assertTrue($company->establishment('90182107400019')?->headOffice);
     }
 
     public function testEverythingTheAnswerSays(): void
     {
         $company = $this->registry('large.json')->company('732829320');
+        self::assertNotNull($company);
 
         self::assertSame('AT', $company->acronym);
         self::assertSame('SAS', (string) $company->legalForm);
         self::assertSame('100-199', (string) $company->headcount);
-        self::assertSame(2023, $company->headcount->year);
+        self::assertSame(2023, $company->headcount?->year);
         self::assertSame([12, 9], [$company->establishmentCount, $company->openEstablishmentCount]);
-        self::assertSame(['ATELIER'], $company->headOffice->signs);
+        self::assertSame(['ATELIER'], $company->headOffice?->signs);
         self::assertSame("L'Atelier", $company->headOffice->name);
-        self::assertSame(CompanyStatus::CLOSED, $company->establishment('73282932000082')->status);
-        self::assertSame('2020-06-30', $company->establishment('73282932000082')->closedOn->format('Y-m-d'));
+        self::assertSame(CompanyStatus::CLOSED, $company->establishment('73282932000082')?->status);
+        self::assertSame('2020-06-30', $company->establishment('73282932000082')->closedOn?->format('Y-m-d'));
 
         [$president, $auditor] = $company->managers;
         self::assertTrue($president->person);
@@ -127,6 +130,6 @@ final class AnnuaireEntreprisesTest extends TestCase
 
     private function registry(string $fixture): AnnuaireEntreprises
     {
-        return new AnnuaireEntreprises(new MockHttpClient(new MockResponse(file_get_contents(__DIR__.'/Fixtures/'.$fixture))));
+        return new AnnuaireEntreprises(new MockHttpClient(new MockResponse((string) file_get_contents(__DIR__.'/Fixtures/'.$fixture))));
     }
 }

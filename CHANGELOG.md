@@ -11,6 +11,10 @@
 - A 429 is thrown with `$status` 429: through the facade, the next calls wait for its `retryAfter`.
 - PHPStan at level max, its baseline what the package had on 2026-11-10.
 
+### Changed
+- PHPStan at level max with an empty baseline, types only (`Headcounts::RANGES` and
+  `LegalForms::FORMS` keyed `int|string`, as PHP keeps their numeric codes).
+
 ### Fixed
 - `company()` called directly reads the identifier as `supports()` does: spaces, dots and dashes
   are dropped before asking, so `company('356 000 000')` finds La Poste, where it answered `null`
