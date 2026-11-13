@@ -18,6 +18,14 @@ plain PHP, a `MockHttpClient` in a test.
 
 Too many calls throw `UnavailableException` with the `Retry-After` the API gave.
 
+## Install
+
+```sh
+composer require omnistate/annuaire-entreprises
+```
+
+It brings the family's core, `omnisense/omnistate`, and `omnisense/contracts` with it. No account and no key: the API is open, about seven calls a second ([`policy.json`](policy.json)).
+
 ## Responsibility
 
 This package is an independent, unofficial client: it is not affiliated with, endorsed by or
