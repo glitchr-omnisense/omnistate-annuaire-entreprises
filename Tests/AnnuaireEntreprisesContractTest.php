@@ -18,6 +18,17 @@ final class AnnuaireEntreprisesContractTest extends TestCase
         return new AnnuaireEntreprises($http);
     }
 
+    /** The company of Tests/Fixtures/siren.json, named here: the suite's default changed with omnisense/omnistate 1.0.1. */
+    protected function companyIdentifier(): string
+    {
+        return '552032534';
+    }
+
+    protected function searchQuery(): string
+    {
+        return 'danone';
+    }
+
     protected function recordedAnswers(): array
     {
         return ['*' => static fn (string $method, string $url) => new MockResponse((string) file_get_contents(__DIR__.'/Fixtures/'.match (true) {
