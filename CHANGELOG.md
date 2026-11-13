@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-13
+
+### Changed
+- The README's example and the test fixtures `siren.json`, `siret.json`: DANONE (552032534), as
+  Recherche d'entreprises answered on 2026-11-13 with the officers left out, instead of a small
+  company whose record named its officer; the managers' parsing is checked on the invented record
+  of `large.json`.
+
 ## [1.0.0] - 2026-11-13
 
 ### Added

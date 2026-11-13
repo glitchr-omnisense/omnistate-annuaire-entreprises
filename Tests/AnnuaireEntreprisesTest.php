@@ -13,27 +13,26 @@ final class AnnuaireEntreprisesTest extends TestCase
 {
     public function testACompanyBySiren(): void
     {
-        $company = $this->registry('siren.json')->company('901821074');
+        $company = $this->registry('siren.json')->company('552032534');
         self::assertNotNull($company);
 
-        self::assertSame('GLITCH ART', $company->name);
+        self::assertSame('DANONE', $company->name);
         self::assertSame(CompanyStatus::ACTIVE, $company->status);
-        self::assertSame('5499', $company->legalForm?->code);
-        self::assertSame('SARL', (string) $company->legalForm);
-        self::assertSame('62.02A', $company->activity?->code);
-        self::assertSame('J', $company->activity->section);
-        self::assertSame('PME', $company->category);
-        self::assertFalse($company->headcount?->isEmployer(), 'NN: no employee');
-        self::assertSame('2021-07-03', $company->createdOn?->format('Y-m-d'));
-        self::assertSame('FR53901821074', $company->vatNumber, 'from its SIREN');
-        self::assertSame('90182107400019', $company->headOffice?->identifier);
-        self::assertSame('5 RUE VINCENT SCOTTO', $company->headOffice->address?->street);
-        self::assertSame('ILLKIRCH-GRAFFENSTADEN', $company->headOffice->address->city);
-        self::assertEqualsWithDelta(48.5313533, $company->headOffice->address->latitude, 1e-6);
-        self::assertSame('MARCO MEYER', (string) $company->managers[0]);
-        self::assertSame('Gérant', $company->managers[0]->role);
+        self::assertSame('5599', $company->legalForm?->code);
+        self::assertSame('SA', (string) $company->legalForm);
+        self::assertSame('70.10Z', $company->activity?->code);
+        self::assertSame('M', $company->activity->section);
+        self::assertSame('GE', $company->category);
+        self::assertTrue($company->headcount?->isEmployer(), '42: 1000 to 1999 employees');
+        self::assertSame('1955-01-01', $company->createdOn?->format('Y-m-d'));
+        self::assertSame('FR27552032534', $company->vatNumber, 'from its SIREN');
+        self::assertSame('55203253400703', $company->headOffice?->identifier);
+        self::assertSame('59 RUE LA FAYETTE', $company->headOffice->address?->street);
+        self::assertSame('PARIS', $company->headOffice->address->city);
+        self::assertEqualsWithDelta(48.8763540, $company->headOffice->address->latitude, 1e-6);
+        self::assertSame([], $company->managers, 'the recorded answer\'s officers left out');
         self::assertSame('annuaire-entreprises', $company->source);
-        self::assertSame('901821074', $company->raw['siren'], 'the whole answer kept');
+        self::assertSame('552032534', $company->raw['siren'], 'the whole answer kept');
     }
 
     /** What supports() takes, company() finds: spaces, dots and dashes are not the identifier. */
@@ -47,18 +46,18 @@ final class AnnuaireEntreprisesTest extends TestCase
         });
         $registry = new AnnuaireEntreprises($http);
 
-        self::assertTrue($registry->supports('901 821 074'));
-        self::assertSame('GLITCH ART', $registry->company('901 821 074')?->name);
-        self::assertSame('GLITCH ART', $registry->company('901.821.074-00019')?->name);
-        self::assertStringContainsString('q=901821074&', $requests[0], 'asked as the register writes it');
+        self::assertTrue($registry->supports('552 032 534'));
+        self::assertSame('DANONE', $registry->company('552 032 534')?->name);
+        self::assertSame('DANONE', $registry->company('552.032.534-00703')?->name);
+        self::assertStringContainsString('q=552032534&', $requests[0], 'asked as the register writes it');
     }
 
     public function testAnEstablishmentBySiret(): void
     {
-        $company = $this->registry('siret.json')->company('90182107400019');
+        $company = $this->registry('siret.json')->company('55203253400703');
         self::assertNotNull($company);
 
-        self::assertTrue($company->establishment('90182107400019')?->headOffice);
+        self::assertTrue($company->establishment('55203253400703')?->headOffice);
     }
 
     public function testEverythingTheAnswerSays(): void
@@ -78,6 +77,8 @@ final class AnnuaireEntreprisesTest extends TestCase
 
         [$president, $auditor] = $company->managers;
         self::assertTrue($president->person);
+        self::assertSame('JEANNE DUPONT', (string) $president, 'an invented person: first names, then name');
+        self::assertSame('Président', $president->role);
         self::assertSame(1970, $president->birthYear);
         self::assertFalse($auditor->person, 'a company');
         self::assertSame('CABINET AUDIT', $auditor->name);
@@ -92,7 +93,7 @@ final class AnnuaireEntreprisesTest extends TestCase
 
     public function testNotKnown(): void
     {
-        self::assertNull((new AnnuaireEntreprises(new MockHttpClient(new MockResponse('{"results":[],"total_results":0}'))))->company('901821074'));
+        self::assertNull((new AnnuaireEntreprises(new MockHttpClient(new MockResponse('{"results":[],"total_results":0}'))))->company('552032534'));
     }
 
     public function testTooManyCalls(): void
@@ -100,7 +101,7 @@ final class AnnuaireEntreprisesTest extends TestCase
         $registry = new AnnuaireEntreprises(new MockHttpClient(new MockResponse('Too Many Requests.', ['http_code' => 429, 'response_headers' => ['Retry-After: 2']])));
 
         try {
-            $registry->company('901821074');
+            $registry->company('552032534');
             self::fail('unavailable');
         } catch (UnavailableException $e) {
             self::assertSame(2, $e->retryAfter);
@@ -109,9 +110,9 @@ final class AnnuaireEntreprisesTest extends TestCase
 
     public function testAnAnswerNotShapedAsTheRegistersIsUnavailable(): void
     {
-        foreach (['{"results":"none"}', '{"results":[{"siren":"901821074","dirigeants":"none"}]}'] as $body) {
+        foreach (['{"results":"none"}', '{"results":[{"siren":"552032534","dirigeants":"none"}]}'] as $body) {
             try {
-                (new AnnuaireEntreprises(new MockHttpClient(new MockResponse($body))))->company('901821074');
+                (new AnnuaireEntreprises(new MockHttpClient(new MockResponse($body))))->company('552032534');
                 self::fail('unavailable: '.$body);
             } catch (UnavailableException $e) {
                 self::assertStringStartsWith('Recherche d\'entreprises answered', $e->getMessage());
@@ -122,9 +123,9 @@ final class AnnuaireEntreprisesTest extends TestCase
     public function testSupports(): void
     {
         $registry = new AnnuaireEntreprises(new MockHttpClient());
-        self::assertTrue($registry->supports('901821074'));
-        self::assertTrue($registry->supports('90182107400019'));
-        self::assertFalse($registry->supports('901821075'), 'its key wrong');
+        self::assertTrue($registry->supports('552032534'));
+        self::assertTrue($registry->supports('55203253400703'));
+        self::assertFalse($registry->supports('552032535'), 'its key wrong');
         self::assertFalse($registry->supports('DE123456789'));
     }
 

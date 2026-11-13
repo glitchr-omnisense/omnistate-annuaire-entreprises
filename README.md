@@ -5,7 +5,7 @@ the one behind [annuaire-entreprises.data.gouv.fr](https://annuaire-entreprises.
 INPI's national register (RNE), free, no key, about seven calls a second. For [omnisense/omnistate](../core).
 
 ```php
-$company = (new AnnuaireEntreprises($httpClient))->company('901821074');   // or a SIRET
+$company = (new AnnuaireEntreprises($httpClient))->company('552032534');   // or a SIRET
 $company->name, $company->legalForm, $company->status, $company->activity, $company->category,
 $company->headcount, $company->headOffice, $company->establishments, $company->managers,
 $company->finances, $company->labels /* ess, rge, qualiopi... */, $company->collectiveAgreements,
